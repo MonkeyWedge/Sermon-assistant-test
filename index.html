@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sermon Companion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #fefefe; color: #333; }
+    h2, h3 { margin-bottom: 10px; }
+    #transcript, #response { border: 1px solid #ccc; padding: 10px; background: #fff; height: 120px; overflow-y: auto; margin-bottom: 15px; }
+    button { margin: 5px 5px 10px 0; padding: 10px 16px; font-size: 1rem; border: none; border-radius: 5px; background: #007AFF; color: white; }
+    button:hover { background: #005BBB; }
+    .secondary { background: #ddd; color: #333; }
+    #status { margin: 10px 0; font-style: italic; color: #555; }
+  </style>
+</head>
+<body>
+  <h2>Sermon Companion</h2>
+  <p id="status">Tap "Start Listening" to begin.</p>
+  <div id="transcript" aria-label="Live Transcript"></div>
+  <button onclick="startListening()">Start Listening</button>
+  <button onclick="stopListening()" class="secondary">Stop</button>
+  <h3>Need help? Tap a button:</h3>
+  <button onclick="askGPT('summarize')">Summarize</button>
+  <button onclick="askGPT('explain')">Explain</button>
+  <button onclick="askGPT('translate')">Plain Language</button>
+  <button onclick="askGPT('prayer')">Prayer</button>
+  <button onclick="askGPT('focus')">Focus Anchor</button>
+  <div id="response" aria-label="Assistant Response">Assistant replies will appear here...</div>
+
+  <script>
+    let recognition;
+    let transcriptData = "";
+
+    function startListening() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.onresult = (event) => {
+        let newText = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          newText += event.results[i][0].transcript;
+        }
+        transcriptData += newText + " ";
+        document.getElementById("transcript").innerText = transcriptData;
+      };
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event);
+      };
+      recognition.start();
+      document.getElementById("status").innerText = "Listening...";
+    }
+
+    function stopListening() {
+      if (recognition) {
+        recognition.stop();
+        document.getElementById("status").innerText = "Stopped.";
+      }
+    }
+
+    function askGPT(action) {
+      const latest = transcriptData.trim().slice(-1000);
+      let response = "";
+      switch(action) {
+        case 'summarize':
+          response = "Here’s a quick summary: This part of the sermon seems to focus on hope and resilience through faith.";
+          break;
+        case 'explain':
+          response = "This section is likely connecting the scripture to personal growth. Would you like a breakdown of a specific verse?";
+          break;
+        case 'translate':
+          response = "Plain Language: God wants you to know you're not alone. This message is about how He walks with you in struggle.";
+          break;
+        case 'prayer':
+          response = "Prayer: 'God, help me hold on to your promise in this moment. Give me peace, even when I don’t understand everything.'";
+          break;
+        case 'focus':
+          response = "Focus Anchor: Just listen for one moment of comfort or clarity. That’s your anchor right now.";
+          break;
+        default:
+          response = "Need something specific? You can ask for more support anytime.";
+      }
+      document.getElementById("response").innerText = response;
+    }
+  </script>
+</body>
+</html>

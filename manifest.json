@@ -1,0 +1,10 @@
+
+{
+  "name": "Sermon Companion",
+  "short_name": "SermonCompanion",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "Live transcription and sermon support tool.",
+  "icons": []
+}
